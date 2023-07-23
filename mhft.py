@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
 def load_mental_health_data():
-    data = pd.read_csv('mental_health_data.csv')
+    data = pd.read_csv('mhd.csv')
     data.dropna(inplace=True)
     return data
 
