@@ -1,57 +1,35 @@
-import random
-import datetime
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 
-class MentalHealthTracker:
+def load_mental_health_data():
+    data = pd.read_csv('mental_health_data.csv')
+    data.dropna(inplace=True)
+    return data
 
-    def __init__(self):
-        self.mood = "neutral"
-        self.sleep_quality = "average"
-        self.stress_level = "low"
+def train_linear_regression_model(data):
+    X = data[['year', 'country', 'sex', 'age', 'suicides_no']]
+    y = data['suicides_no']
+    X = pd.get_dummies(X)
+    model = LinearRegression()
+    model.fit(X, y)
+    return model
 
-    def track_mood(self, mood):
-        self.mood = mood
+def predict_mental_health_score(model, year, country, sex, age):
+    user_inputs = pd.DataFrame({
+        'year': [year],
+        'country': [country],
+        'sex': [sex],
+        'age': [age],
+        'suicides_no': [0]  
+    })
+    user_inputs = pd.get_dummies(user_inputs)
+    predicted_score = model.predict(user_inputs)
+    return predicted_score[0]
 
-    def track_sleep_quality(self, sleep_quality):
-        self.sleep_quality = sleep_quality
-
-    def track_stress_level(self, stress_level):
-        self.stress_level = stress_level
-
-    def get_insights(self):
-        insights = []
-        if self.mood == "sad":
-            insights.append("It's okay to not be okay.")
-            insights.append("Reach out to a friend or family member for support.")
-        elif self.sleep_quality == "bad":
-            insights.append("Try some relaxation techniques before bed.")
-            insights.append("Make sure you're getting enough exercise during the day.")
-        elif self.stress_level == "high":
-            insights.append("Take some time for yourself to relax.")
-            insights.append("Talk to a therapist or counselor if you're feeling overwhelmed.")
-        return insights
-
-    def get_recommendations(self):
-        recommendations = []
-        if self.mood == "sad":
-            recommendations.append("Try some meditation exercises.")
-            recommendations.append("Listen to some relaxing music.")
-        elif self.sleep_quality == "bad":
-            recommendations.append("Go for a walk in nature.")
-            recommendations.append("Read a book before bed.")
-        elif self.stress_level == "high":
-            recommendations.append("Try some deep breathing exercises.")
-            recommendations.append("Yoga can help to reduce stress.")
-        return recommendations
-
-def main():
-    tracker = MentalHealthTracker()
-    tracker.track_mood("sad")
-    tracker.track_sleep_quality("bad")
-    tracker.track_stress_level("high")
-    insights = tracker.get_insights()
-    recommendations = tracker.get_recommendations()
-    print("Insights:", insights)
-    print("Recommendations:", recommendations)
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    data = load_mental_health_data()
+    model = train_linear_regression_model(data)
+    predicted_score = predict_mental_health_score(model, 2020, 'United States', 'male', '35-54 years')
+    print(f"Predicted Mental Health Score: {predicted_score}")
